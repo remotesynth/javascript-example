@@ -1,0 +1,52 @@
+<html>
+  <head>
+    <title>Super Complex Home Page</title>
+    <script
+      crossorigin="anonymous"
+      src="https://unpkg.com/launchdarkly-js-client-sdk@latest"
+    ></script>
+  </head>
+  <body>
+    <h1>Welcome to my super complex home page!</h1>
+    <p>This is a super complex home page.</p>
+    <div>
+      <button id="toggleButton" enabled="false">I'm off</button>
+    </div>
+    <p>
+      <img src="/image.jpg" width="500" id="bannerImage" />
+    </p>
+    <script src="/reload/reload.js"></script>
+    <script>
+      function updateFlagStatus(flagValue) {
+        const toggleButton = document.getElementById("toggleButton");
+        if (flagValue) {
+          toggleButton.enabled = true;
+          toggleButton.innerText = "Click Me";
+          toggleButton.addEventListener("click", setImage);
+        } else {
+          toggleButton.enabled = false;
+          toggleButton.innerText = "I'm off";
+          toggleButton.removeEventListener("click", setImage);
+        }
+      }
+      function setImage() {
+        const image = document.getElementById("bannerImage");
+        image.src =
+          "https://images.pexels.com/photos/1629780/pexels-photo-1629780.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500";
+      }
+      var user = {
+        key: "anonymous",
+      };
+      var client = LDClient.initialize("61409b046ca8d52601d179ef", user);
+      client.on("ready", function () {
+        const showFeature = client.variation("show-feature", false);
+        updateFlagStatus(showFeature);
+        client.on("change", function (settings) {
+          if (settings["show-feature"]) {
+            updateFlagStatus(settings["show-feature"].current);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
